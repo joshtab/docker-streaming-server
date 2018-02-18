@@ -1,4 +1,4 @@
-FROM codeworksio/nginx:1.13.8-20180212
+FROM nginx:1.13.8
 
 ARG APT_PROXY
 ARG APT_PROXY_SSL
@@ -7,23 +7,22 @@ ENV NGINX_RTMP_MODULE_VERSION="1.2.1"
 RUN set -ex; \
     \
     buildDependencies="\
+        curl
         build-essential \
         libpcre3-dev \
         libssl-dev \
         zlib1g-dev \
     "; \
-    if [ -n "$APT_PROXY" ]; then echo "Acquire::http { Proxy \"http://${APT_PROXY}\"; };" > /etc/apt/apt.conf.d/00proxy; fi; \
-    if [ -n "$APT_PROXY_SSL" ]; then echo "Acquire::https { Proxy \"https://${APT_PROXY_SSL}\"; };" > /etc/apt/apt.conf.d/00proxy; fi; \
-    apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-keys "4AB0F789CBA31744CC7DA76A8CF63AD3F06FC659"; \
-    echo "deb http://ppa.launchpad.net/jonathonf/ffmpeg-3/ubuntu xenial main" > /etc/apt/sources.list.d/ffmpeg.list; \
+    # if [ -n "$APT_PROXY" ]; then echo "Acquire::http { Proxy \"http://${APT_PROXY}\"; };" > /etc/apt/apt.conf.d/00proxy; fi; \
+    # if [ -n "$APT_PROXY_SSL" ]; then echo "Acquire::https { Proxy \"https://${APT_PROXY_SSL}\"; };" > /etc/apt/apt.conf.d/00proxy; fi; \
     apt-get --yes update; \
     apt-get --yes install \
         $buildDependencies \
         ffmpeg \
     ; \
     cd /tmp; \
-    curl -L "https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz" -o nginx-$NGINX_VERSION.tar.gz; \
-    tar -xf nginx-$NGINX_VERSION.tar.gz; \
+    curl -L "https://nginx.org/download/nginx-1.13.8.tar.gz" -o nginx.tar.gz; \
+    tar -xf nginx.tar.gz; \
     curl -L "https://github.com/arut/nginx-rtmp-module/archive/v${NGINX_RTMP_MODULE_VERSION}.tar.gz" -o nginx-rtmp-module-$NGINX_RTMP_MODULE_VERSION.tar.gz; \
     tar -xf nginx-rtmp-module-$NGINX_RTMP_MODULE_VERSION.tar.gz; \
     \
